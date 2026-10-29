@@ -58,4 +58,3 @@
 
 = Ссылка на последний успешный запуск pipeline
 #link(pipeline-url)
-
