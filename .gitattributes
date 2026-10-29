@@ -4,3 +4,5 @@ mvnw text eol=lf
 *.cmd text eol=crlf
 *.png binary
 *.pdf binary
+# Preserve scanner artifacts byte-for-byte, including their original whitespace.
+report/evidence/** -text -whitespace
