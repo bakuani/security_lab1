@@ -1,0 +1,39 @@
+{
+  "pipeline_url": "https://github.com/bakuani/security_lab1/actions/runs/40864492503",
+  "pipeline_id": 40864492503,
+  "commit": "58845bed700a840b461198c35fba08f1eb8df900",
+  "status": "success",
+  "completed_at": "2026-10-29T11:34:03Z",
+  "tests": 31,
+  "curl_checks": 12,
+  "sast_findings_after_documented_exclusions": 0,
+  "sca_unique_dependencies": 32,
+  "sca_unique_cves": 0,
+  "artifacts": [
+    {
+      "id": 12894320866,
+      "name": "sca-report",
+      "digest": "sha256:4a0e691e3079f09e06dc08eaa5d5de63f9bb84fcb05503c6eac86f205c7a5429"
+    },
+    {
+      "id": 12893451166,
+      "name": "tests-and-sast",
+      "digest": "sha256:9b194f7acdf2e869cd3f48be2de5798a18d82fa9f922ee64d137a90d2614a319"
+    }
+  ],
+  "evidence_sha256": {
+    "integration-tests.txt": "bd5a0ca817439e6a16601acd7ffbc7c765342a7fa4732c9b6f5f23071e5a7d18",
+    "results.json": "892a9e5ec25b8678248f98a8c99af3dbaeeb98e097c7a77f7e6fc942fb384e38",
+    "sca-after.html": "843e0e4be60db521a780cbdd2e702cc6d65146db4122bfe87f1bac0f56ae2e1d",
+    "sca-after.json": "2e10aaaeaaa860f9fe66096beb81eb03d4f9413c36403dbf04495d8ec959153e",
+    "sca-before.json": "bcb63a8056e9a8503552b0c705942ef77852ceb8c21a8ddc5de3d66e94289f42",
+    "spotbugsXml.xml": "d69556772f431460658651d961aff887708d8402fe5f36fc426b6f4930df0edf",
+    "transcript.md": "bbcfea7c70e0f09ac5c258d3e9003e09f630958dc720c900ce3c854ee5059b7d"
+  },
+  "screenshots_sha256": {
+    "sast-actions.png": "da3c05e63b86d1c2271b72cb1d8035571cddd7af84f89cbe90596e00272dbbbd",
+    "sca-actions.png": "6874df510e8d3d0eb8fe3ac2e39cdfe03e7db9c8a116f2a846e9f782c3eac332",
+    "sca-before.png": "41d82f2af7da9ef49e4399bae40782ddabfc185b884a3af5dd492d48662a090c",
+    "sca-report.png": "e9d3da9e3333fe13712c08e75534db79171bdf86b55421765d6a22df69156b85"
+  }
+}

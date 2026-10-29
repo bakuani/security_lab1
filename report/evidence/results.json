@@ -1,0 +1,139 @@
+[
+  {
+    "check": "no JWT",
+    "method": "GET",
+    "path": "/api/data",
+    "status": 401,
+    "response": {
+      "error": "Authentication required"
+    }
+  },
+  {
+    "check": "login",
+    "method": "POST",
+    "path": "/auth/login",
+    "status": 200,
+    "response": {
+      "tokenType": "Bearer",
+      "expiresIn": 900
+    }
+  },
+  {
+    "check": "wrong password",
+    "method": "POST",
+    "path": "/auth/login",
+    "status": 401,
+    "response": {
+      "error": "Invalid credentials"
+    }
+  },
+  {
+    "check": "SQL injection rejected",
+    "method": "POST",
+    "path": "/auth/login",
+    "status": 401,
+    "response": {
+      "error": "Invalid credentials"
+    }
+  },
+  {
+    "check": "owner-scoped list",
+    "method": "GET",
+    "path": "/api/data",
+    "status": 200,
+    "response": [
+      {
+        "id": 1,
+        "title": "Изучить JWT",
+        "description": "Проверить подпись и срок действия токена",
+        "status": "OPEN"
+      },
+      {
+        "id": 2,
+        "title": "Проверить XSS: &lt;script&gt;alert(&#39;demo&#39;)&lt;/script&gt;",
+        "description": "Строка &lt;img src=x onerror=alert(1)&gt; должна возвращаться как текст",
+        "status": "OPEN"
+      }
+    ]
+  },
+  {
+    "check": "change own task",
+    "method": "PATCH",
+    "path": "/api/data/1/status",
+    "status": 200,
+    "response": {
+      "status": "DONE"
+    }
+  },
+  {
+    "check": "status saved",
+    "method": "GET",
+    "path": "/api/data",
+    "status": 200,
+    "response": [
+      {
+        "id": 1,
+        "title": "Изучить JWT",
+        "description": "Проверить подпись и срок действия токена",
+        "status": "DONE"
+      },
+      {
+        "id": 2,
+        "title": "Проверить XSS: &lt;script&gt;alert(&#39;demo&#39;)&lt;/script&gt;",
+        "description": "Строка &lt;img src=x onerror=alert(1)&gt; должна возвращаться как текст",
+        "status": "OPEN"
+      }
+    ]
+  },
+  {
+    "check": "second user login",
+    "method": "POST",
+    "path": "/auth/login",
+    "status": 200,
+    "response": {
+      "tokenType": "Bearer",
+      "expiresIn": 900
+    }
+  },
+  {
+    "check": "second user's list",
+    "method": "GET",
+    "path": "/api/data",
+    "status": 200,
+    "response": [
+      {
+        "id": 3,
+        "title": "Задача Bob",
+        "description": "Эта задача доступна только владельцу",
+        "status": "OPEN"
+      }
+    ]
+  },
+  {
+    "check": "foreign task denied",
+    "method": "PATCH",
+    "path": "/api/data/3/status",
+    "status": 404,
+    "response": {
+      "error": "Task not found"
+    }
+  },
+  {
+    "check": "status validation",
+    "method": "PATCH",
+    "path": "/api/data/1/status",
+    "status": 400,
+    "response": {
+      "error": "Invalid request"
+    }
+  },
+  {
+    "check": "invalid JWT",
+    "method": "GET",
+    "path": "/api/data",
+    "status": 401,
+    "response": {
+      "error": "Authentication required"
+    }
+  }
+]
