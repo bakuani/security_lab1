@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <!-- Find Security Bugs inventories Spring routes as Low informational findings.
+       An endpoint's existence is not a vulnerability. Authentication is tested by HTTP. -->
+  <Match>
+    <Bug pattern="SPRING_ENDPOINT"/>
+  </Match>
+  <!-- These constructors receive singleton infrastructure from the trusted Spring
+       container. Copying a JdbcTemplate or repository would break dependency injection;
+       no controller exposes these references to an HTTP client. -->
+  <Match>
+    <Or>
+      <Class name="ru.itmo.securitylab.Database"/>
+      <Class name="ru.itmo.securitylab.AuthController"/>
+      <Class name="ru.itmo.securitylab.TaskController"/>
+    </Or>
+    <Method name="&lt;init&gt;"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+  <!-- Deliberate stateless Bearer API: no authentication cookies, form login or Basic.
+       Browsers do not add Authorization: Bearer automatically. Tests verify no session
+       cookies and require a token for both protected methods. Revisit if cookies appear. -->
+  <Match>
+    <Class name="ru.itmo.securitylab.SecurityConfig"/>
+    <Method name="configureBearerCsrf"/>
+    <Bug pattern="SPRING_CSRF_PROTECTION_DISABLED"/>
+  </Match>
+</FindBugsFilter>

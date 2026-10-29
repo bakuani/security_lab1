@@ -1,0 +1,12 @@
+target/
+.idea/
+.vscode/
+*.iml
+.env
+*.log
+report/*.png
+!report/screenshots/*.png
+report/report.pdf
+.tools/
+.local/
+__pycache__/

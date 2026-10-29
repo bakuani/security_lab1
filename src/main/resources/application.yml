@@ -1,0 +1,32 @@
+server:
+  address: 127.0.0.1
+  port: 8080
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+  max-http-request-header-size: 8KB
+logging:
+  level:
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+spring:
+  application:
+    name: security-lab1
+  datasource:
+    url: jdbc:h2:mem:tasks;DB_CLOSE_DELAY=-1
+    username: lab
+    password: ${random.uuid}
+  h2:
+    console:
+      enabled: false
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  sql:
+    init:
+      mode: always
+lab:
+  jwt-secret: ${LAB_JWT_SECRET}
+  alice-password: ${LAB_ALICE_PASSWORD}
+  bob-password: ${LAB_BOB_PASSWORD}
