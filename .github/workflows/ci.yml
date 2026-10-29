@@ -40,7 +40,8 @@ jobs:
           name: tests-and-sast
           path: |
             target/surefire-reports/
-            target/spotbugs*
+            target/spotbugsXml.xml
+            target/spotbugs.xml
             target/smoke/results.json
             target/smoke/transcript.md
           if-no-files-found: error

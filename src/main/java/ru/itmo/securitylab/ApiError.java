@@ -1,8 +1,8 @@
 package ru.itmo.securitylab;
 
 import java.io.IOException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
 import jakarta.servlet.http.HttpServletResponse;
 
 public record ApiError(String error) {

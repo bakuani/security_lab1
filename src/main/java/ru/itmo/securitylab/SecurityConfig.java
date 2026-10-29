@@ -76,7 +76,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
                 // Credentials are sent explicitly as Authorization: Bearer, never in cookies.
                 .csrf(SecurityConfig::configureBearerCsrf)
