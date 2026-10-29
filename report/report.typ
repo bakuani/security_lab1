@@ -22,8 +22,7 @@
 #show figure.caption: set text(size: 11pt)
 #show link: set text(fill: black)
 
-#let evidence = json("evidence.json")
-#let pipeline-url = sys.inputs.at("pipeline-url", default: evidence.pipeline_url)
+#let pipeline-url = read("pipeline.txt").trim()
 
 #context {
   set page(numbering: none)
@@ -60,6 +59,3 @@
 = Ссылка на последний успешный запуск pipeline
 #link(pipeline-url)
 
-В запуске выполнены интеграционные проверки, сценарий curl, SAST и SCA.
-Скриншоты в разделе 2 показывают реальные результаты GitHub Actions;
-машиночитаемые отчёты доступны в артефактах запуска.

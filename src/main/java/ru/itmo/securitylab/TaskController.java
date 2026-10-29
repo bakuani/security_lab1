@@ -44,7 +44,7 @@ public class TaskController {
                                       @Valid @RequestBody StatusChange input,
                                       @AuthenticationPrincipal Jwt jwt) {
         if (!database.changeStatus(id, Long.parseLong(jwt.getSubject()), input.status().name())) {
-            // A missing object and someone else's object have indistinguishable responses.
+            // Чужую задачу изменять нельзя.
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return input;

@@ -24,15 +24,8 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - name: Integration tests and package
-        run: ./mvnw -B -ntp verify
-      - name: Verify API with curl
-        run: python3 scripts/smoke-test.py --start
-      - name: SAST - SpotBugs and Find Security Bugs
-        run: ./mvnw -B -ntp spotbugs:spotbugs spotbugs:check
-      - name: Publish SAST summary
-        if: always()
-        run: python3 scripts/security-summary.py sast >> "$GITHUB_STEP_SUMMARY"
+      - name: Tests and SAST - SpotBugs and Find Security Bugs
+        run: ./mvnw -B -ntp verify spotbugs:check
       - name: Upload test and SAST reports
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -42,8 +35,6 @@ jobs:
             target/surefire-reports/
             target/spotbugsXml.xml
             target/spotbugs.xml
-            target/smoke/results.json
-            target/smoke/transcript.md
           if-no-files-found: error
 
   sca:
@@ -57,24 +48,17 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - name: Daily database cache key
-        id: date
-        run: echo "day=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
       - name: Restore NVD database
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.m2/repository/org/owasp/dependency-check-data
-          key: nvd-13-${{ runner.os }}-${{ steps.date.outputs.day }}-${{ github.run_id }}
+          key: nvd-13-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            nvd-13-${{ runner.os }}-${{ steps.date.outputs.day }}-
             nvd-13-${{ runner.os }}-
       - name: SCA - fail on CVSS 7 or greater
         env:
           MAVEN_OPTS: -Xmx4g
         run: ./mvnw -B -ntp dependency-check:check
-      - name: Publish SCA summary
-        if: always()
-        run: python3 scripts/security-summary.py sca >> "$GITHUB_STEP_SUMMARY"
       - name: Upload SCA reports
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

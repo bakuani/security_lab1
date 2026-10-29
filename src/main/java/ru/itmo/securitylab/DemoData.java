@@ -15,7 +15,7 @@ public class DemoData {
                            @Value("${lab.bob-password}") String bobPassword) {
         validatePassword(alicePassword);
         validatePassword(bobPassword);
-        // Only hashes are captured by the runner; passwords are never inserted in SQL.
+        // В базу записываются только хэши паролей.
         String aliceHash = encoder.encode(alicePassword);
         String bobHash = encoder.encode(bobPassword);
         return args -> {

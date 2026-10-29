@@ -1,8 +1,9 @@
 package ru.itmo.securitylab;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
 import javax.crypto.spec.SecretKeySpec;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,15 +17,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
-import org.springframework.security.oauth2.core.OAuth2Error;
-import org.springframework.security.oauth2.core.OAuth2TokenValidator;
-import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimValidator;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
-import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -56,50 +53,25 @@ public class SecurityConfig {
     @Bean
     JwtDecoder jwtDecoder(SecretKeySpec key) {
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
-        OAuth2TokenValidator<Jwt> claims = jwt -> {
-            var audience = jwt.getAudience();
-            var issuedAt = jwt.getIssuedAt();
-            var expiresAt = jwt.getExpiresAt();
-            var subject = jwt.getSubject();
-            boolean valid = audience != null && audience.contains(AUDIENCE)
-                    && expiresAt != null && issuedAt != null
-                    && !issuedAt.isAfter(Instant.now())
-                    && expiresAt.isAfter(issuedAt)
-                    && Duration.between(issuedAt, expiresAt).getSeconds() <= 900
-                    && subject != null && subject.matches("[1-9][0-9]{0,17}");
-            return valid ? OAuth2TokenValidatorResult.success()
-                    : OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token"));
-        };
         decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
-                new JwtTimestampValidator(Duration.ZERO), new JwtIssuerValidator(ISSUER), claims));
+                JwtValidators.createDefaultWithIssuer(ISSUER),
+                new JwtClaimValidator<List<String>>("aud", audience -> audience != null && audience.contains(AUDIENCE)),
+                new JwtClaimValidator<Instant>("exp", Objects::nonNull),
+                new JwtClaimValidator<String>("sub", subject -> subject != null && subject.matches("[1-9][0-9]{0,17}"))));
         return decoder;
     }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
-                // Credentials are sent explicitly as Authorization: Bearer, never in cookies.
+                // В API используется Bearer-токен, а не cookies.
                 .csrf(SecurityConfig::configureBearerCsrf)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .requestCache(cache -> cache.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/data").authenticated()
-                        .requestMatchers(HttpMethod.PATCH, "/api/data/*/status").authenticated()
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().denyAll())
-                .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults())
-                        .authenticationEntryPoint((request, response, exception) ->
-                                ApiError.write(response, 401, "Authentication required")))
-                .exceptionHandling(errors -> errors
-                        .authenticationEntryPoint((request, response, exception) ->
-                                ApiError.write(response, 401, "Authentication required"))
-                        .accessDeniedHandler((request, response, exception) ->
-                                ApiError.write(response, 403, "Access denied")))
-                .headers(headers -> headers
-                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'none'; frame-ancestors 'none'"))
-                        .frameOptions(frame -> frame.deny())
-                        .contentTypeOptions(Customizer.withDefaults())
-                        .cacheControl(Customizer.withDefaults()))
+                .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()))
                 .build();
     }
 

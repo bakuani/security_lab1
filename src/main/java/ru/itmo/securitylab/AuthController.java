@@ -3,7 +3,6 @@ package ru.itmo.securitylab;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -24,13 +23,11 @@ public class AuthController {
     private final Database database;
     private final PasswordEncoder encoder;
     private final JwtEncoder jwtEncoder;
-    private final String dummyHash;
 
     public AuthController(Database database, PasswordEncoder encoder, JwtEncoder jwtEncoder) {
         this.database = database;
         this.encoder = encoder;
         this.jwtEncoder = jwtEncoder;
-        this.dummyHash = encoder.encode(UUID.randomUUID().toString());
     }
 
     public record Login(@NotBlank @Size(max = 64) String username,
@@ -46,17 +43,16 @@ public class AuthController {
         if (input.password().getBytes(StandardCharsets.UTF_8).length > 72) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        var user = database.findUser(input.username());
-        // Unknown users still pay the BCrypt cost; both failures return the same response.
-        boolean matches = encoder.matches(input.password(), user.map(Database.User::passwordHash).orElse(dummyHash));
-        if (!matches || user.isEmpty()) {
+        var user = database.findUser(input.username())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        if (!encoder.matches(input.password(), user.passwordHash())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(SecurityConfig.ISSUER).audience(List.of(SecurityConfig.AUDIENCE))
-                .subject(Long.toString(user.orElseThrow().id()))
-                .issuedAt(now).expiresAt(now.plusSeconds(900)).id(UUID.randomUUID().toString()).build();
+                .subject(Long.toString(user.id()))
+                .issuedAt(now).expiresAt(now.plusSeconds(900)).build();
         String token = jwtEncoder.encode(JwtEncoderParameters.from(
                 JwsHeader.with(MacAlgorithm.HS256).build(), claims)).getTokenValue();
         return new Token(token, "Bearer", 900);
