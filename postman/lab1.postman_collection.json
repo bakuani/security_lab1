@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "ITMO Security Lab 1 - personal tasks",
-    "description": "Run in order. Fill alicePassword and bobPassword locally; do not export live tokens.",
+    "description": "Run in order. Fill annaPassword and ivanPassword locally; do not export live tokens.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -25,7 +25,7 @@
       ]
     },
     {
-      "name": "02. Alice login",
+      "name": "02. Anna login",
       "request": {
         "method": "POST",
         "header": [
@@ -37,7 +37,7 @@
         "url": "{{baseUrl}}/auth/login",
         "body": {
           "mode": "raw",
-          "raw": "{\"username\": \"alice\", \"password\": \"{{alicePassword}}\"}",
+          "raw": "{\"username\": \"anna\", \"password\": \"{{annaPassword}}\"}",
           "options": {
             "raw": {
               "language": "json"
@@ -52,7 +52,7 @@
             "type": "text/javascript",
             "exec": [
               "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
-              "if (pm.response.code === 200) pm.environment.set(\"aliceToken\", pm.response.json().accessToken);"
+              "if (pm.response.code === 200) pm.environment.set(\"annaToken\", pm.response.json().accessToken);"
             ]
           }
         }
@@ -65,7 +65,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{aliceToken}}"
+            "value": "Bearer {{annaToken}}"
           }
         ],
         "url": "{{baseUrl}}/api/data"
@@ -80,7 +80,7 @@
               "const data = pm.response.json();",
               "pm.test(\"Two own tasks\", () => pm.expect(data.length).to.eql(2));",
               "pm.test(\"XSS escaped\", () => pm.expect(data[1].title).to.include(\"&lt;script&gt;\"));",
-              "pm.environment.set(\"aliceTaskId\", data[0].id);"
+              "pm.environment.set(\"annaTaskId\", data[0].id);"
             ]
           }
         }
@@ -97,10 +97,10 @@
           },
           {
             "key": "Authorization",
-            "value": "Bearer {{aliceToken}}"
+            "value": "Bearer {{annaToken}}"
           }
         ],
-        "url": "{{baseUrl}}/api/data/{{aliceTaskId}}/status",
+        "url": "{{baseUrl}}/api/data/{{annaTaskId}}/status",
         "body": {
           "mode": "raw",
           "raw": "{\"status\": \"DONE\"}",
@@ -134,10 +134,10 @@
           },
           {
             "key": "Authorization",
-            "value": "Bearer {{aliceToken}}"
+            "value": "Bearer {{annaToken}}"
           }
         ],
-        "url": "{{baseUrl}}/api/data/{{aliceTaskId}}/status",
+        "url": "{{baseUrl}}/api/data/{{annaTaskId}}/status",
         "body": {
           "mode": "raw",
           "raw": "{\"status\": \"INVALID\"}",
@@ -173,7 +173,7 @@
         "url": "{{baseUrl}}/auth/login",
         "body": {
           "mode": "raw",
-          "raw": "{\"username\": \"alice' OR '1'='1' --\", \"password\": \"incorrect-demo-password\"}",
+          "raw": "{\"username\": \"anna' OR '1'='1' --\", \"password\": \"incorrect-demo-password\"}",
           "options": {
             "raw": {
               "language": "json"
@@ -194,7 +194,7 @@
       ]
     },
     {
-      "name": "07. Bob login",
+      "name": "07. Ivan login",
       "request": {
         "method": "POST",
         "header": [
@@ -206,7 +206,7 @@
         "url": "{{baseUrl}}/auth/login",
         "body": {
           "mode": "raw",
-          "raw": "{\"username\": \"bob\", \"password\": \"{{bobPassword}}\"}",
+          "raw": "{\"username\": \"ivan\", \"password\": \"{{ivanPassword}}\"}",
           "options": {
             "raw": {
               "language": "json"
@@ -221,20 +221,20 @@
             "type": "text/javascript",
             "exec": [
               "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
-              "if (pm.response.code === 200) pm.environment.set(\"bobToken\", pm.response.json().accessToken);"
+              "if (pm.response.code === 200) pm.environment.set(\"ivanToken\", pm.response.json().accessToken);"
             ]
           }
         }
       ]
     },
     {
-      "name": "08. Bob own task",
+      "name": "08. Ivan own task",
       "request": {
         "method": "GET",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{bobToken}}"
+            "value": "Bearer {{ivanToken}}"
           }
         ],
         "url": "{{baseUrl}}/api/data"
@@ -248,14 +248,14 @@
               "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
               "const data = pm.response.json();",
               "pm.test(\"One task\", () => pm.expect(data.length).to.eql(1));",
-              "pm.environment.set(\"bobTaskId\", data[0].id);"
+              "pm.environment.set(\"ivanTaskId\", data[0].id);"
             ]
           }
         }
       ]
     },
     {
-      "name": "09. Alice cannot change Bob task",
+      "name": "09. Anna cannot change Ivan task",
       "request": {
         "method": "PATCH",
         "header": [
@@ -265,10 +265,10 @@
           },
           {
             "key": "Authorization",
-            "value": "Bearer {{aliceToken}}"
+            "value": "Bearer {{annaToken}}"
           }
         ],
-        "url": "{{baseUrl}}/api/data/{{bobTaskId}}/status",
+        "url": "{{baseUrl}}/api/data/{{ivanTaskId}}/status",
         "body": {
           "mode": "raw",
           "raw": "{\"status\": \"DONE\"}",

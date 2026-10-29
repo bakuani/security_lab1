@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "lab.jwt-secret=test-only-key-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-        "lab.alice-password=AliceDemo2026!", "lab.bob-password=BobDemo2026!"})
+        "lab.anna-password=AnnaDemo2026!", "lab.ivan-password=IvanDemo2026!"})
 @AutoConfigureTestRestTemplate
 class ApiSecurityTest {
     @Autowired TestRestTemplate http;
@@ -44,7 +44,7 @@ class ApiSecurityTest {
 
     @Test
     void loginAndListOwnTasks() {
-        var login = login("alice", "AliceDemo2026!");
+        var login = login("anna", "AnnaDemo2026!");
         assertThat(login.getStatusCode().value()).isEqualTo(200);
         assertThat(json.readTree(login.getBody()).get("expiresIn").asInt()).isEqualTo(900);
         var response = get(token());
@@ -55,8 +55,8 @@ class ApiSecurityTest {
 
     @Test
     void rejectsWrongPasswordAndSqlInjection() {
-        assertThat(login("alice", "wrong-password").getStatusCode().value()).isEqualTo(401);
-        assertThat(login("alice' OR '1'='1' --", "wrong-password").getStatusCode().value()).isEqualTo(401);
+        assertThat(login("anna", "wrong-password").getStatusCode().value()).isEqualTo(401);
+        assertThat(login("anna' OR '1'='1' --", "wrong-password").getStatusCode().value()).isEqualTo(401);
     }
 
     @Test
@@ -87,9 +87,9 @@ class ApiSecurityTest {
     @Test
     void storesPasswordAsBcryptHash() {
         String hash = jdbc.queryForObject("SELECT password_hash FROM app_user WHERE username = ?",
-                String.class, "alice");
+                String.class, "anna");
         assertThat(hash).startsWith("$2a$12$");
-        assertThat(passwordEncoder.matches("AliceDemo2026!", hash)).isTrue();
+        assertThat(passwordEncoder.matches("AnnaDemo2026!", hash)).isTrue();
     }
 
     private ResponseEntity<String> login(String username, String password) {
@@ -97,7 +97,7 @@ class ApiSecurityTest {
     }
 
     private String token() {
-        return json.readTree(login("alice", "AliceDemo2026!").getBody()).get("accessToken").asText();
+        return json.readTree(login("anna", "AnnaDemo2026!").getBody()).get("accessToken").asText();
     }
 
     private ResponseEntity<String> get(String token) {

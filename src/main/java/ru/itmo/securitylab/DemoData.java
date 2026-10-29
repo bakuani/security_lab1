@@ -11,22 +11,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class DemoData {
     @Bean
     CommandLineRunner seed(Database database, PasswordEncoder encoder,
-                           @Value("${lab.alice-password}") String alicePassword,
-                           @Value("${lab.bob-password}") String bobPassword) {
-        validatePassword(alicePassword);
-        validatePassword(bobPassword);
+                           @Value("${lab.anna-password}") String annaPassword,
+                           @Value("${lab.ivan-password}") String ivanPassword) {
+        validatePassword(annaPassword);
+        validatePassword(ivanPassword);
         // В базу записываются только хэши паролей.
-        String aliceHash = encoder.encode(alicePassword);
-        String bobHash = encoder.encode(bobPassword);
+        String annaHash = encoder.encode(annaPassword);
+        String ivanHash = encoder.encode(ivanPassword);
         return args -> {
-            database.addUser("alice", aliceHash);
-            database.addUser("bob", bobHash);
-            long aliceId = database.findUser("alice").orElseThrow().id();
-            long bobId = database.findUser("bob").orElseThrow().id();
-            database.addTask(aliceId, "Изучить JWT", "Проверить подпись и срок действия токена");
-            database.addTask(aliceId, "Проверить XSS: <script>alert('demo')</script>",
+            database.addUser("anna", annaHash);
+            database.addUser("ivan", ivanHash);
+            long annaId = database.findUser("anna").orElseThrow().id();
+            long ivanId = database.findUser("ivan").orElseThrow().id();
+            database.addTask(annaId, "Изучить JWT", "Проверить подпись и срок действия токена");
+            database.addTask(annaId, "Проверить XSS: <script>alert('demo')</script>",
                     "Строка <img src=x onerror=alert(1)> должна возвращаться как текст");
-            database.addTask(bobId, "Задача Bob", "Эта задача доступна только владельцу");
+            database.addTask(ivanId, "Задача Ivan", "Эта задача доступна только владельцу");
         };
     }
 

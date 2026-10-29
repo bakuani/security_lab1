@@ -28,5 +28,5 @@ spring:
       mode: always
 lab:
   jwt-secret: ${LAB_JWT_SECRET}
-  alice-password: ${LAB_ALICE_PASSWORD}
-  bob-password: ${LAB_BOB_PASSWORD}
+  anna-password: ${LAB_ANNA_PASSWORD}
+  ivan-password: ${LAB_IVAN_PASSWORD}
